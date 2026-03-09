@@ -141,7 +141,6 @@ class ReportComposer:
             toc.append(ToCEntry(title="📈 Trend Analysis", anchor="trend-analysis"))
         if forecast_section:
             toc.append(ToCEntry(title="🔮 Where Things Are Headed", anchor="forecasts"))
-        toc.append(ToCEntry(title="🧪 Methodology", anchor="methodology"))
         return toc
 
 
