@@ -134,7 +134,7 @@ class ReportComposer:
         trend_analysis: TrendAnalysis | None,
         forecast_section: ForecastSection | None,
     ) -> list[ToCEntry]:
-        toc = [ToCEntry(title="🧠 Executive Summary", anchor="executive-summary")]
+        toc: list[ToCEntry] = []
         for section in sections:
             toc.append(ToCEntry(title=section.title, anchor=section.anchor))
         if trend_analysis:
@@ -226,10 +226,6 @@ class ReportRenderer:
                 f"{report.scanned_candidate_count} relevant, "
                 f"{report.selected_repo_count} selected"
             ),
-            "",
-            "## 🧠 Executive Summary",
-            "",
-            report.executive_summary,
             "",
             "## 🧭 Table of Contents",
         ]

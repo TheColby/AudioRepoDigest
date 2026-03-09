@@ -3,9 +3,6 @@ Colby's AudioRepoDigest
 {{ report.subtitle }}
 🗓️ Report period: {{ period_label }} | ⏱️ Generated: {{ generated_at_label }} | 👤 Recipient: {{ report.recipient_name }} | 📊 Scanned {{ report.metadata["raw_candidate_count"] }} raw, {{ report.scanned_candidate_count }} relevant, {{ report.selected_repo_count }} selected
 
-🧠 EXECUTIVE SUMMARY
-{{ report.executive_summary }}
-
 🧭 TABLE OF CONTENTS
 {% for entry in report.toc -%}
 - {{ entry.title }}

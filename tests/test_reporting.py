@@ -13,7 +13,8 @@ def test_build_section_uses_expected_anchor() -> None:
 def test_renderer_outputs_html_text_and_markdown(rendered_report_bundle) -> None:
     report, bundle = rendered_report_bundle
     assert "Table of Contents" in bundle.html
-    assert "Executive Summary" in bundle.text
+    assert "EXECUTIVE SUMMARY" not in bundle.text
     assert report.sections[0].entries[0].candidate.html_url in bundle.html
     assert report.sections[0].entries[0].candidate.html_url in bundle.text
+    assert "↳ Details" in bundle.html
     assert "Where Things Are Headed" in bundle.markdown
