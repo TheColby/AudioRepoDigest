@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ report.title }}</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background: #f3f5f7;
+        color: #17212b;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        line-height: 1.5;
+      }
+      a {
+        color: #0b5cab;
+        text-decoration: none;
+      }
+      .container {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 24px 12px 48px;
+      }
+      .panel {
+        background: #ffffff;
+        border: 1px solid #d9e1e8;
+        border-radius: 14px;
+        padding: 24px;
+        margin-bottom: 18px;
+      }
+      .header {
+        background: linear-gradient(135deg, #dff3ee 0%, #f9fcff 100%);
+      }
+      .eyebrow {
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #597180;
+        margin: 0 0 8px;
+      }
+      h1, h2, h3, p {
+        margin-top: 0;
+      }
+      h1 {
+        font-size: 30px;
+        line-height: 1.1;
+        margin-bottom: 8px;
+      }
+      h2 {
+        font-size: 22px;
+        margin-bottom: 6px;
+      }
+      h3 {
+        font-size: 18px;
+        margin-bottom: 8px;
+      }
+      .muted {
+        color: #5a6d7c;
+        font-size: 14px;
+      }
+      .summary-box {
+        background: #eef7ff;
+        border-left: 4px solid #0b5cab;
+        padding: 16px;
+        border-radius: 10px;
+      }
+      .toc-list,
+      .methodology-list,
+      .narrative-list {
+        margin: 0;
+        padding-left: 18px;
+      }
+      .toc-list li,
+      .methodology-list li,
+      .narrative-list li {
+        margin-bottom: 6px;
+      }
+      .repo-card {
+        border-top: 1px solid #e4ebf1;
+        padding-top: 18px;
+        margin-top: 18px;
+      }
+      .repo-card:first-child {
+        border-top: 0;
+        padding-top: 0;
+        margin-top: 0;
+      }
+      .repo-title {
+        font-size: 18px;
+        font-weight: 700;
+      }
+      .rank {
+        display: inline-block;
+        min-width: 28px;
+        font-weight: 700;
+        color: #0b5cab;
+      }
+      .meta,
+      .score-row,
+      .stats-row {
+        color: #3f5362;
+        font-size: 14px;
+      }
+      .tags {
+        margin: 10px 0 8px;
+      }
+      .tag {
+        display: inline-block;
+        margin: 0 6px 6px 0;
+        padding: 4px 9px;
+        background: #f2f6f9;
+        border: 1px solid #d8e3ec;
+        border-radius: 999px;
+        font-size: 12px;
+        color: #365062;
+      }
+      .analysis-grid {
+        display: block;
+      }
+      .forecast-card {
+        border: 1px solid #d7e0e7;
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 12px;
+        background: #fbfcfd;
+      }
+      .footer {
+        color: #6d7d89;
+        font-size: 13px;
+      }
+      @media only screen and (max-width: 600px) {
+        .panel {
+          padding: 18px;
+        }
+        h1 {
+          font-size: 25px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="panel header">
+        <p class="eyebrow">AudioRepoDigest</p>
+        <h1>{{ report.title }}</h1>
+        <p class="muted">{{ report.subtitle }}</p>
+        <p class="muted"><strong>Report period:</strong> {{ period_label }}</p>
+        <p class="muted"><strong>Generated:</strong> {{ generated_at_label }}</p>
+        <p class="muted"><strong>Recipient:</strong> {{ report.recipient_name }}</p>
+        <p class="muted">
+          Scanned {{ report.metadata["raw_candidate_count"] }} raw candidates, kept
+          {{ report.scanned_candidate_count }} relevant candidates, selected
+          {{ report.selected_repo_count }} repos across ranked sections.
+        </p>
+      </div>
+
+      <div class="panel" id="executive-summary">
+        <h2>Executive Summary</h2>
+        <div class="summary-box">
+          <p>{{ report.executive_summary }}</p>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Table of Contents</h2>
+        <ul class="toc-list">
+          {% for entry in report.toc %}
+          <li><a href="#{{ entry.anchor }}">{{ entry.title }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      {% for section in report.sections %}
+      <div class="panel" id="{{ section.anchor }}">
+        <h2>{{ section.title }}</h2>
+        <p class="muted">{{ section.description }}</p>
+        {% if section.entries %}
+          {% for ranked in section.entries %}
+          {% set repo = ranked.candidate %}
+          <div class="repo-card">
+            <div class="repo-title">
+              <span class="rank">#{{ ranked.rank }}</span>
+              <a href="{{ repo.html_url }}">{{ repo.full_name }}</a>
+            </div>
+            <p class="meta">
+              Owner: {{ repo.owner }}
+              {% if repo.language %} | Language: {{ repo.language }}{% endif %}
+              | Created: {{ repo.created_at.date().isoformat() }}
+              | Updated: {{ repo.updated_at.date().isoformat() }}
+            </p>
+            <p>{{ repo.description or "No description provided." }}</p>
+            <div class="tags">
+              {% for tag in repo.primary_tags %}
+              <span class="tag">{{ tag.replace("_", " ") }}</span>
+              {% endfor %}
+            </div>
+            <p class="stats-row">
+              <strong>Stats:</strong>
+              {{ repo.stargazers_count }} stars,
+              {{ repo.forks_count }} forks,
+              {{ repo.open_issues_count }} open issues,
+              {{ repo.watchers_count }} watchers
+            </p>
+            <p class="score-row">
+              <strong>Score:</strong> {{ "%.2f"|format(ranked.score.total_score) }}
+              {% for label, value in ranked.score.components.items() %}
+              | {{ label.replace("_", " ") }}={{ "%.1f"|format(value) }}
+              {% endfor %}
+            </p>
+            <p class="score-row"><strong>Why it made the list:</strong> {{ ranked.why_included }}</p>
+          </div>
+          {% endfor %}
+        {% else %}
+          <p>No repositories qualified for this section in the current window.</p>
+        {% endif %}
+      </div>
+      {% endfor %}
+
+      {% if report.trend_analysis %}
+      <div class="panel" id="trend-analysis">
+        <h2>Comprehensive Analysis of the Week's Trends</h2>
+        <p><strong>{{ report.trend_analysis.headline }}</strong></p>
+        <ul class="narrative-list">
+          {% for paragraph in report.trend_analysis.narrative_sections %}
+          <li>{{ paragraph }}</li>
+          {% endfor %}
+        </ul>
+        <p class="muted">
+          Dominant tags:
+          {% for tag in report.trend_analysis.dominant_tags %}
+          {% if not loop.first %}, {% endif %}{{ tag.replace("_", " ") }}
+          {% endfor %}
+        </p>
+        {% if report.trend_analysis.repeated_keywords %}
+        <p class="muted">
+          Repeated keywords:
+          {% for word in report.trend_analysis.repeated_keywords %}
+          {% if not loop.first %}, {% endif %}{{ word }}
+          {% endfor %}
+        </p>
+        {% endif %}
+        {% if report.trend_analysis.underrepresented_segments %}
+        <p class="muted">
+          Underrepresented or cooling segments:
+          {% for bucket in report.trend_analysis.underrepresented_segments %}
+          {% if not loop.first %}, {% endif %}{{ bucket.replace("_", " ") }}
+          {% endfor %}
+        </p>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      {% if report.forecast_section %}
+      <div class="panel" id="forecasts">
+        <h2>{{ report.forecast_section.headline }}</h2>
+        <p>{{ report.forecast_section.intro }}</p>
+        <div class="analysis-grid">
+          {% for item in report.forecast_section.items %}
+          <div class="forecast-card">
+            <h3>{{ item.title }}</h3>
+            <p>{{ item.estimate }}</p>
+            <p class="muted"><strong>Signals:</strong> {{ item.signals }}</p>
+            <p class="muted"><strong>Implications:</strong> {{ item.implications }}</p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="panel" id="methodology">
+        <h2>Methodology</h2>
+        <ul class="methodology-list">
+          {% for item in report.methodology %}
+          <li>{{ item }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <div class="footer">
+        Generated by AudioRepoDigest v{{ report.version }}. This report is rendered directly in the email body with inline hyperlinks and a plaintext alternative.
+      </div>
+    </div>
+  </body>
+</html>
+

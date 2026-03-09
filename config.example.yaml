@@ -1,0 +1,44 @@
+github_token: ghp_your_github_token
+
+smtp_host: smtp.gmail.com
+smtp_port: 587
+smtp_username: colbyleider@gmail.com
+smtp_password: your_smtp_password
+smtp_from: "AudioRepoDigest <colbyleider@gmail.com>"
+smtp_use_starttls: true
+smtp_use_ssl: false
+
+report_recipient_email: colbyleider@gmail.com
+report_recipient_name: Colby Leider
+report_frequency: weekly
+report_cron: "0 13 * * 1"
+report_timezone: America/New_York
+report_lookback_days: 7
+
+top_n_main: 10
+top_n_new: 7
+top_n_audio_ai: 7
+
+include_honorable_mentions: true
+include_trend_analysis: true
+include_forecasts: true
+max_candidates_to_scan: 180
+github_search_window_days: 21
+readme_fallback_limit: 6
+
+email_subject_prefix: "[AudioRepoDigest]"
+allowlist_topics:
+  - audio
+  - music
+  - dsp
+  - speech
+  - synthesis
+blocklist_terms:
+  - car audio
+  - audiobook
+  - discord bot
+
+output_html_path: artifacts/digest.html
+output_markdown_path: artifacts/digest.md
+output_json_path: artifacts/digest.json
+

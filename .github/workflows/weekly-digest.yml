@@ -1,0 +1,104 @@
+name: AudioRepoDigest
+
+on:
+  schedule:
+    - cron: "0 13 * * 1"
+  workflow_dispatch:
+    inputs:
+      recipient_email:
+        description: Optional recipient override for manual runs
+        required: false
+        type: string
+      recipient_name:
+        description: Optional recipient name override for manual runs
+        required: false
+        type: string
+      start_date:
+        description: Optional explicit start date (YYYY-MM-DD)
+        required: false
+        type: string
+      end_date:
+        description: Optional explicit end date (YYYY-MM-DD)
+        required: false
+        type: string
+      dry_run:
+        description: Render without sending email
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  run-digest:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Sync dependencies
+        run: uv sync --group dev
+
+      - name: Generate and send digest
+        env:
+          GITHUB_TOKEN: ${{ secrets.AUDIOREPODIGEST_GITHUB_TOKEN || github.token }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          SMTP_FROM: ${{ secrets.SMTP_FROM }}
+          SMTP_USE_STARTTLS: ${{ secrets.SMTP_USE_STARTTLS || 'true' }}
+          SMTP_USE_SSL: ${{ secrets.SMTP_USE_SSL || 'false' }}
+          REPORT_RECIPIENT_EMAIL: ${{ github.event.inputs.recipient_email || secrets.REPORT_RECIPIENT_EMAIL }}
+          REPORT_RECIPIENT_NAME: ${{ github.event.inputs.recipient_name || secrets.REPORT_RECIPIENT_NAME }}
+          REPORT_FREQUENCY: ${{ secrets.REPORT_FREQUENCY || 'weekly' }}
+          REPORT_CRON: ${{ secrets.REPORT_CRON || '0 13 * * 1' }}
+          REPORT_TIMEZONE: ${{ secrets.REPORT_TIMEZONE || 'America/New_York' }}
+          TOP_N_MAIN: ${{ secrets.TOP_N_MAIN || '10' }}
+          TOP_N_NEW: ${{ secrets.TOP_N_NEW || '7' }}
+          TOP_N_AUDIO_AI: ${{ secrets.TOP_N_AUDIO_AI || '7' }}
+          INCLUDE_HONORABLE_MENTIONS: ${{ secrets.INCLUDE_HONORABLE_MENTIONS || 'true' }}
+          INCLUDE_TREND_ANALYSIS: ${{ secrets.INCLUDE_TREND_ANALYSIS || 'true' }}
+          INCLUDE_FORECASTS: ${{ secrets.INCLUDE_FORECASTS || 'true' }}
+          MAX_CANDIDATES_TO_SCAN: ${{ secrets.MAX_CANDIDATES_TO_SCAN || '180' }}
+          GITHUB_SEARCH_WINDOW_DAYS: ${{ secrets.GITHUB_SEARCH_WINDOW_DAYS || '21' }}
+          LOG_LEVEL: ${{ secrets.LOG_LEVEL || 'INFO' }}
+          EMAIL_SUBJECT_PREFIX: ${{ secrets.EMAIL_SUBJECT_PREFIX || '[AudioRepoDigest]' }}
+          OUTPUT_HTML_PATH: artifacts/digest.html
+          OUTPUT_MARKDOWN_PATH: artifacts/digest.md
+          OUTPUT_JSON_PATH: artifacts/digest.json
+        run: |
+          ARGS=()
+          if [ "${{ github.event.inputs.dry_run || 'false' }}" = "true" ]; then
+            ARGS+=("--dry-run")
+          fi
+          if [ -n "${{ github.event.inputs.start_date }}" ]; then
+            ARGS+=("--start-date" "${{ github.event.inputs.start_date }}")
+          fi
+          if [ -n "${{ github.event.inputs.end_date }}" ]; then
+            ARGS+=("--end-date" "${{ github.event.inputs.end_date }}")
+          fi
+          if [ -n "${{ github.event.inputs.recipient_email }}" ]; then
+            ARGS+=("--recipient-email" "${{ github.event.inputs.recipient_email }}")
+          fi
+          if [ -n "${{ github.event.inputs.recipient_name }}" ]; then
+            ARGS+=("--recipient-name" "${{ github.event.inputs.recipient_name }}")
+          fi
+          uv run audiodigest run "${ARGS[@]}"
+
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: audiodigest-artifacts
+          path: artifacts/
+          if-no-files-found: ignore
+
