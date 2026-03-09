@@ -2,8 +2,7 @@
 
 Automated email digests of the most important audio, music, DSP, and audio-AI GitHub repos on a configurable schedule.
 
-AudioRepoDigest discovers and ranks relevant GitHub repositories, then emails the **full report directly in the email body** (HTML + plaintext fallback).  
-Default deployment is **GitHub Actions + SMTP**.
+AudioRepoDigest discovers and ranks relevant GitHub repositories, then emails the **full report directly in the email body** (HTML + plaintext fallback). Default deployment is **GitHub Actions + SMTP**.
 
 ## What You Get
 
