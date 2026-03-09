@@ -48,10 +48,10 @@ Replace values where needed, then run:
 ```bash
 gh secret set SMTP_HOST -R TheColby/AudioRepoDigest -b "smtp.gmail.com"
 gh secret set SMTP_PORT -R TheColby/AudioRepoDigest -b "587"
-gh secret set SMTP_USERNAME -R TheColby/AudioRepoDigest -b "colbyleider@gmail.com"
+gh secret set SMTP_USERNAME -R TheColby/AudioRepoDigest -b "your.email@gmail.com"
 gh secret set SMTP_FROM -R TheColby/AudioRepoDigest -b "AudioRepoDigest <colbyleider@gmail.com>"
-gh secret set REPORT_RECIPIENT_EMAIL -R TheColby/AudioRepoDigest -b "colbyleider@gmail.com"
-gh secret set REPORT_RECIPIENT_NAME -R TheColby/AudioRepoDigest -b "Colby Leider"
+gh secret set REPORT_RECIPIENT_EMAIL -R TheColby/AudioRepoDigest -b "your.email@gmail.com"
+gh secret set REPORT_RECIPIENT_NAME -R TheColby/AudioRepoDigest -b "Your Name"
 ```
 
 Set SMTP password securely (prompted):
