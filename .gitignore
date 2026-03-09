@@ -10,4 +10,6 @@ build/
 artifacts/
 *.pyc
 .env
-
+config.yaml
+config.local.yaml
+*.swp

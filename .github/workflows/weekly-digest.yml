@@ -27,9 +27,14 @@ on:
         default: false
         type: boolean
 
+concurrency:
+  group: audiodigest-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   run-digest:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       contents: read
     steps:
@@ -46,6 +51,37 @@ jobs:
 
       - name: Sync dependencies
         run: uv sync --group dev
+
+      - name: Validate required secrets
+        env:
+          GITHUB_TOKEN: ${{ secrets.AUDIOREPODIGEST_GITHUB_TOKEN || github.token }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          SMTP_FROM: ${{ secrets.SMTP_FROM }}
+          REPORT_RECIPIENT_EMAIL: ${{ github.event.inputs.recipient_email || secrets.REPORT_RECIPIENT_EMAIL }}
+          REPORT_RECIPIENT_NAME: ${{ github.event.inputs.recipient_name || secrets.REPORT_RECIPIENT_NAME }}
+        run: |
+          missing=0
+          for key in \
+            GITHUB_TOKEN \
+            SMTP_HOST \
+            SMTP_PORT \
+            SMTP_USERNAME \
+            SMTP_PASSWORD \
+            SMTP_FROM \
+            REPORT_RECIPIENT_EMAIL \
+            REPORT_RECIPIENT_NAME
+          do
+            if [ -z "${!key}" ]; then
+              echo "::error title=Missing required secret::${key} is empty or not set."
+              missing=1
+            fi
+          done
+          if [ "${missing}" -ne 0 ]; then
+            exit 1
+          fi
 
       - name: Generate and send digest
         env:
@@ -100,5 +136,5 @@ jobs:
         with:
           name: audiodigest-artifacts
           path: artifacts/
+          retention-days: 14
           if-no-files-found: ignore
-

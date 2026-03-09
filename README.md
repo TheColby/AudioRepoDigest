@@ -227,6 +227,40 @@ The workflow already defaults the schedule to Monday morning. To customize the s
 - the cron under `on.schedule`
 - or `REPORT_CRON` if you also use custom local scheduling conventions
 
+### GitHub Actions only runbook
+
+If you are running this project only via GitHub Actions, this is the fastest path:
+
+1. Push the repository (already done if your branch is on GitHub).
+2. In GitHub, open `Settings -> Secrets and variables -> Actions -> Repository secrets`.
+3. Add required secrets:
+   - `SMTP_HOST`
+   - `SMTP_PORT`
+   - `SMTP_USERNAME`
+   - `SMTP_PASSWORD`
+   - `SMTP_FROM`
+   - `REPORT_RECIPIENT_EMAIL`
+   - `REPORT_RECIPIENT_NAME`
+4. Add optional but recommended secrets:
+   - `AUDIOREPODIGEST_GITHUB_TOKEN` (improves GitHub API quota)
+   - `REPORT_TIMEZONE` (`America/New_York` for Colby)
+   - `EMAIL_SUBJECT_PREFIX` (defaults to `[AudioRepoDigest]`)
+5. Open `Actions -> AudioRepoDigest -> Run workflow` and run once with `dry_run=true`.
+6. Inspect generated artifacts (`digest.html`, `digest.md`, `digest.json`) in the workflow run.
+7. Run again with `dry_run=false` to send the first live email.
+
+What has already been prepared in this repo for Actions:
+
+- Weekly default schedule: Monday mornings (`0 13 * * 1`).
+- Manual `workflow_dispatch` execution with optional recipient/date overrides.
+- Preflight secret validation step that fails fast with clear missing-key errors.
+- Concurrency control to avoid overlapping digest runs.
+- Artifact upload configured for every run.
+
+Local-only config safety:
+
+- `config.yaml` and `config.local.yaml` are git-ignored and are not used by the Actions workflow unless you explicitly change the workflow to pass `--config`.
+
 ## SMTP notes
 
 AudioRepoDigest expects a normal SMTP relay. Gmail, Mailgun, Postmark SMTP, Fastmail, or a corporate SMTP gateway all work as long as you set the right host, port, username, password, and TLS mode.

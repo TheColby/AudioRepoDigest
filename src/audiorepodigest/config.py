@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, ClassVar
+from typing import Annotated, Any, ClassVar
 from zoneinfo import ZoneInfo
 
 from croniter import croniter
 from pydantic import Field, ValidationInfo, field_validator, model_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict, YamlConfigSettingsSource
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict, YamlConfigSettingsSource
 
 from audiorepodigest.models import ReportFrequency
 
@@ -73,8 +73,14 @@ class DigestSettings(BaseSettings):
     email_subject_prefix: str = Field(
         default="[AudioRepoDigest]", validation_alias="EMAIL_SUBJECT_PREFIX"
     )
-    allowlist_topics: list[str] = Field(default_factory=list, validation_alias="ALLOWLIST_TOPICS")
-    blocklist_terms: list[str] = Field(default_factory=list, validation_alias="BLOCKLIST_TERMS")
+    allowlist_topics: Annotated[list[str], NoDecode] = Field(
+        default_factory=list,
+        validation_alias="ALLOWLIST_TOPICS",
+    )
+    blocklist_terms: Annotated[list[str], NoDecode] = Field(
+        default_factory=list,
+        validation_alias="BLOCKLIST_TERMS",
+    )
 
     output_html_path: Path | None = Field(default=None, validation_alias="OUTPUT_HTML_PATH")
     output_markdown_path: Path | None = Field(default=None, validation_alias="OUTPUT_MARKDOWN_PATH")
