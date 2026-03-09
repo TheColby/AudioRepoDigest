@@ -3,6 +3,8 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="supported-color-schemes" content="light dark" />
     <title>{{ report.title }}</title>
     <style>
       body {
@@ -158,6 +160,79 @@
         h1 {
           font-size: 25px;
         }
+      }
+      @media (prefers-color-scheme: dark) {
+        body {
+          background: #0f1722 !important;
+          color: #eaf1f7 !important;
+        }
+        a {
+          color: #78b8ff !important;
+        }
+        .panel {
+          background: #162333 !important;
+          border-color: #2a3b4f !important;
+        }
+        .header {
+          background: linear-gradient(135deg, #15283f 0%, #1b2f49 100%) !important;
+        }
+        .eyebrow,
+        .muted,
+        .meta,
+        .score-row,
+        .stats-row,
+        .footer,
+        .header-line {
+          color: #c7d5e3 !important;
+        }
+        .summary-box {
+          background: #10233a !important;
+          border-left-color: #78b8ff !important;
+        }
+        .repo-card {
+          border-top-color: #2a3b4f !important;
+        }
+        .tag {
+          background: #1f3042 !important;
+          border-color: #33506a !important;
+          color: #d8e8f7 !important;
+        }
+        details.repo-details {
+          border-color: #2f465d !important;
+          background: #122132 !important;
+        }
+        details.repo-details summary {
+          color: #d2e3f4 !important;
+        }
+        .forecast-card {
+          background: #132334 !important;
+          border-color: #2f465d !important;
+        }
+      }
+      [data-ogsc] body {
+        background: #0f1722 !important;
+        color: #eaf1f7 !important;
+      }
+      [data-ogsc] .panel {
+        background: #162333 !important;
+        border-color: #2a3b4f !important;
+      }
+      [data-ogsc] .header {
+        background: #1b2f49 !important;
+      }
+      [data-ogsc] .summary-box {
+        background: #10233a !important;
+        border-left-color: #78b8ff !important;
+      }
+      [data-ogsc] .eyebrow,
+      [data-ogsc] .muted,
+      [data-ogsc] .meta,
+      [data-ogsc] .score-row,
+      [data-ogsc] .stats-row,
+      [data-ogsc] .footer,
+      [data-ogsc] .header-line,
+      [data-ogsc] details.repo-details summary {
+        color: #c7d5e3 !important;
       }
     </style>
   </head>
