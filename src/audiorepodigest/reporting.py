@@ -23,10 +23,10 @@ from audiorepodigest.models import (
 from audiorepodigest.utils.dates import format_timestamp
 
 SECTION_TITLES = {
-    CategoryKey.TOP_AUDIO: "Top Audio Repos",
-    CategoryKey.TOP_NEW: "Top New Audio/Music Repos",
-    CategoryKey.TOP_AUDIO_AI: "Top Audio AI Repos",
-    CategoryKey.HONORABLE_MENTIONS: "Honorable Mentions",
+    CategoryKey.TOP_AUDIO: "🎵 Top Audio Repos",
+    CategoryKey.TOP_NEW: "🆕 Top New Audio/Music Repos",
+    CategoryKey.TOP_AUDIO_AI: "🤖 Top Audio AI Repos",
+    CategoryKey.HONORABLE_MENTIONS: "⭐ Honorable Mentions",
 }
 
 
@@ -73,7 +73,7 @@ class ReportComposer:
         ]
 
         return DigestReport(
-            title="AudioRepoDigest",
+            title="Colby's AudioRepoDigest",
             subtitle=(
                 "Automated intelligence reporting for the audio, music, DSP, speech, and "
                 "audio-AI GitHub ecosystem."
@@ -134,14 +134,14 @@ class ReportComposer:
         trend_analysis: TrendAnalysis | None,
         forecast_section: ForecastSection | None,
     ) -> list[ToCEntry]:
-        toc = [ToCEntry(title="Executive Summary", anchor="executive-summary")]
+        toc = [ToCEntry(title="🧠 Executive Summary", anchor="executive-summary")]
         for section in sections:
             toc.append(ToCEntry(title=section.title, anchor=section.anchor))
         if trend_analysis:
-            toc.append(ToCEntry(title="Trend Analysis", anchor="trend-analysis"))
+            toc.append(ToCEntry(title="📈 Trend Analysis", anchor="trend-analysis"))
         if forecast_section:
-            toc.append(ToCEntry(title="Where Things Are Headed", anchor="forecasts"))
-        toc.append(ToCEntry(title="Methodology", anchor="methodology"))
+            toc.append(ToCEntry(title="🔮 Where Things Are Headed", anchor="forecasts"))
+        toc.append(ToCEntry(title="🧪 Methodology", anchor="methodology"))
         return toc
 
 
@@ -164,12 +164,18 @@ class ReportRenderer:
             "generated_at_label": generated_at_label,
             "period_label": period_label,
             "timezone": settings.report_timezone,
+            "verbosity": settings.report_verbosity.value,
         }
         html = self.environment.get_template("digest_email.html.j2").render(**view_model)
         text = self.environment.get_template("digest_email.txt.j2").render(**view_model)
-        markdown = self._render_markdown(report, generated_at_label, period_label)
+        markdown = self._render_markdown(
+            report,
+            generated_at_label,
+            period_label,
+            settings.report_verbosity.value,
+        )
         json_payload = report.model_dump(mode="json")
-        subject = f"{settings.email_subject_prefix} AudioRepoDigest | {period_label}"
+        subject = f"{settings.email_subject_prefix} Colby's AudioRepoDigest | {period_label}"
         return RenderBundle(
             subject=subject.strip(),
             html=html,
@@ -206,20 +212,26 @@ class ReportRenderer:
         report: DigestReport,
         generated_at_label: str,
         period_label: str,
+        verbosity: str,
     ) -> str:
         lines = [
             f"# {report.title}",
             "",
             report.subtitle,
             "",
-            f"**Report period:** {period_label}",
-            f"**Generated:** {generated_at_label}",
+            (
+                f"**Report period:** {period_label} | **Generated:** {generated_at_label} | "
+                f"**Recipient:** {report.recipient_name} | **Scanned:** "
+                f"{report.metadata['raw_candidate_count']} raw, "
+                f"{report.scanned_candidate_count} relevant, "
+                f"{report.selected_repo_count} selected"
+            ),
             "",
-            "## Executive Summary",
+            "## 🧠 Executive Summary",
             "",
             report.executive_summary,
             "",
-            "## Table of Contents",
+            "## 🧭 Table of Contents",
         ]
         for entry in report.toc:
             lines.append(f"- {entry.title}")
@@ -235,26 +247,42 @@ class ReportRenderer:
                     [
                         "",
                         f"### {ranked.rank}. [{repository.full_name}]({repository.html_url})",
-                        f"- Owner: {repository.owner}",
                         f"- Description: {repository.description or 'No description provided.'}",
                         f"- Tags: {', '.join(repository.primary_tags) or 'n/a'}",
-                        (
-                            f"- Stats: {repository.stargazers_count} stars, "
-                            f"{repository.forks_count} forks, "
-                            f"{repository.open_issues_count} open issues"
-                        ),
-                        f"- Score: {ranked.score.total_score} ({score_details})",
-                        f"- Why included: {ranked.why_included}",
                     ]
                 )
+                if verbosity == "detailed":
+                    lines.extend(
+                        [
+                            (
+                                f"- Metadata: owner={repository.owner}, "
+                                f"language={repository.language or 'n/a'}, "
+                                f"created={repository.created_at.date().isoformat()}, "
+                                f"updated={repository.updated_at.date().isoformat()}"
+                            ),
+                            (
+                                f"- Stats: {repository.stargazers_count} stars, "
+                                f"{repository.forks_count} forks, "
+                                f"{repository.open_issues_count} open issues, "
+                                f"{repository.watchers_count} watchers"
+                            ),
+                            f"- Score: {ranked.score.total_score:.2f} | {score_details}",
+                            f"- Why it made the list: {ranked.why_included}",
+                        ]
+                    )
+                else:
+                    lines.append(
+                        "- Details: stats/score/rationale are available in HTML expandable "
+                        "sections."
+                    )
 
         if report.trend_analysis:
-            lines.extend(["", "## Trend Analysis", "", report.trend_analysis.headline])
+            lines.extend(["", "## 📈 Trend Analysis", "", report.trend_analysis.headline])
             for paragraph in report.trend_analysis.narrative_sections:
                 lines.extend(["", paragraph])
 
         if report.forecast_section:
-            lines.extend(["", "## Where Things Are Headed", "", report.forecast_section.intro])
+            lines.extend(["", "## 🔮 Where Things Are Headed", "", report.forecast_section.intro])
             for item in report.forecast_section.items:
                 lines.extend(
                     [
@@ -268,9 +296,19 @@ class ReportRenderer:
                     ]
                 )
 
-        lines.extend(["", "## Methodology"])
+        lines.extend(["", "## 🧪 Methodology"])
         lines.extend([f"- {item}" for item in report.methodology])
         lines.extend(["", f"_Generated by AudioRepoDigest v{report.version}_"])
+        lines.extend(
+            [
+                "",
+                (
+                    "Want to generate your own customized automated, scheduled report like "
+                    "this? Check out my repo at "
+                    "https://github.com/TheColby/AudioRepoDigest"
+                ),
+            ]
+        )
         return "\n".join(lines)
 
 
@@ -285,8 +323,7 @@ def build_section(
             "traction, and recent activity."
         ),
         CategoryKey.TOP_NEW: (
-            "Repositories created during the reporting window that already show "
-            "credible momentum."
+            "Repositories created during the reporting window that already show credible momentum."
         ),
         CategoryKey.TOP_AUDIO_AI: (
             "Repositories centered on speech, generative audio, music AI, voice "

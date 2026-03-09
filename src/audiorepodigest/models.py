@@ -15,6 +15,12 @@ class ReportFrequency(StrEnum):
     CUSTOM = "custom"
 
 
+class ReportVerbosity(StrEnum):
+    COMPACT = "compact"
+    STANDARD = "standard"
+    DETAILED = "detailed"
+
+
 class CategoryKey(StrEnum):
     TOP_AUDIO = "top_audio"
     TOP_NEW = "top_new"

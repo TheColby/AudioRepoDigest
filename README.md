@@ -181,6 +181,7 @@ Main configuration fields:
 - `REPORT_FREQUENCY`
 - `REPORT_CRON`
 - `REPORT_TIMEZONE`
+- `REPORT_VERBOSITY` (`compact`, `standard`, `detailed`)
 - `TOP_N_MAIN`
 - `TOP_N_NEW`
 - `TOP_N_AUDIO_AI`
@@ -198,6 +199,12 @@ Useful optional fields:
 - `OUTPUT_HTML_PATH`
 - `OUTPUT_MARKDOWN_PATH`
 - `OUTPUT_JSON_PATH`
+
+Report verbosity modes:
+
+- `compact`: repo name + description + tags only, details hidden
+- `standard`: concise cards with expandable detail blocks in HTML
+- `detailed`: includes owner/language/date metadata and expanded scoring details
 
 For `REPORT_FREQUENCY=custom`, set `REPORT_CRON` and optionally tune `REPORT_LOOKBACK_DAYS` so the digest window matches your schedule.
 

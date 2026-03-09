@@ -7,7 +7,7 @@ from audiorepodigest.reporting import build_section
 def test_build_section_uses_expected_anchor() -> None:
     section = build_section(CategoryKey.TOP_AUDIO_AI, [])
     assert section.anchor == "top-audio-ai"
-    assert section.title == "Top Audio AI Repos"
+    assert section.title == "🤖 Top Audio AI Repos"
 
 
 def test_renderer_outputs_html_text_and_markdown(rendered_report_bundle) -> None:

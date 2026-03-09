@@ -59,6 +59,10 @@
         color: #5a6d7c;
         font-size: 14px;
       }
+      .header-line {
+        color: #324a59;
+        font-size: 14px;
+      }
       .summary-box {
         background: #eef7ff;
         border-left: 4px solid #0b5cab;
@@ -90,6 +94,9 @@
         font-size: 18px;
         font-weight: 700;
       }
+      .repo-title a {
+        word-break: break-word;
+      }
       .rank {
         display: inline-block;
         min-width: 28px;
@@ -118,6 +125,21 @@
       .analysis-grid {
         display: block;
       }
+      details.repo-details {
+        margin-top: 10px;
+        border: 1px solid #dbe4ea;
+        border-radius: 10px;
+        padding: 10px 12px;
+        background: #fbfdff;
+      }
+      details.repo-details summary {
+        cursor: pointer;
+        color: #274255;
+        font-weight: 600;
+      }
+      .detail-lines p {
+        margin: 10px 0 0 0;
+      }
       .forecast-card {
         border: 1px solid #d7e0e7;
         border-radius: 12px;
@@ -142,28 +164,26 @@
   <body>
     <div class="container">
       <div class="panel header">
-        <p class="eyebrow">AudioRepoDigest</p>
+        <p class="eyebrow">🎧 AudioRepoDigest</p>
         <h1>{{ report.title }}</h1>
         <p class="muted">{{ report.subtitle }}</p>
-        <p class="muted"><strong>Report period:</strong> {{ period_label }}</p>
-        <p class="muted"><strong>Generated:</strong> {{ generated_at_label }}</p>
-        <p class="muted"><strong>Recipient:</strong> {{ report.recipient_name }}</p>
-        <p class="muted">
-          Scanned {{ report.metadata["raw_candidate_count"] }} raw candidates, kept
-          {{ report.scanned_candidate_count }} relevant candidates, selected
-          {{ report.selected_repo_count }} repos across ranked sections.
+        <p class="header-line">
+          <strong>🗓️ Report period:</strong> {{ period_label }} |
+          <strong>⏱️ Generated:</strong> {{ generated_at_label }} |
+          <strong>👤 Recipient:</strong> {{ report.recipient_name }} |
+          <strong>📊 Scanned:</strong> {{ report.metadata["raw_candidate_count"] }} raw, {{ report.scanned_candidate_count }} relevant, {{ report.selected_repo_count }} selected
         </p>
       </div>
 
       <div class="panel" id="executive-summary">
-        <h2>Executive Summary</h2>
+        <h2>🧠 Executive Summary</h2>
         <div class="summary-box">
           <p>{{ report.executive_summary }}</p>
         </div>
       </div>
 
       <div class="panel">
-        <h2>Table of Contents</h2>
+        <h2>🧭 Table of Contents</h2>
         <ul class="toc-list">
           {% for entry in report.toc %}
           <li><a href="#{{ entry.anchor }}">{{ entry.title }}</a></li>
@@ -178,37 +198,49 @@
         {% if section.entries %}
           {% for ranked in section.entries %}
           {% set repo = ranked.candidate %}
+          {% set detail_summary = "↳ Expand details" %}
           <div class="repo-card">
             <div class="repo-title">
               <span class="rank">#{{ ranked.rank }}</span>
               <a href="{{ repo.html_url }}">{{ repo.full_name }}</a>
             </div>
-            <p class="meta">
-              Owner: {{ repo.owner }}
-              {% if repo.language %} | Language: {{ repo.language }}{% endif %}
-              | Created: {{ repo.created_at.date().isoformat() }}
-              | Updated: {{ repo.updated_at.date().isoformat() }}
-            </p>
-            <p>{{ repo.description or "No description provided." }}</p>
+            <p>📝 {{ repo.description or "No description provided." }}</p>
             <div class="tags">
               {% for tag in repo.primary_tags %}
               <span class="tag">{{ tag.replace("_", " ") }}</span>
               {% endfor %}
             </div>
-            <p class="stats-row">
-              <strong>Stats:</strong>
-              {{ repo.stargazers_count }} stars,
-              {{ repo.forks_count }} forks,
-              {{ repo.open_issues_count }} open issues,
-              {{ repo.watchers_count }} watchers
+            {% if verbosity == "detailed" %}
+            <p class="meta">
+              👤 Owner: {{ repo.owner }}
+              {% if repo.language %} | 💻 Language: {{ repo.language }}{% endif %}
+              | 🏗️ Created: {{ repo.created_at.date().isoformat() }}
+              | 🔄 Updated: {{ repo.updated_at.date().isoformat() }}
             </p>
-            <p class="score-row">
-              <strong>Score:</strong> {{ "%.2f"|format(ranked.score.total_score) }}
-              {% for label, value in ranked.score.components.items() %}
-              | {{ label.replace("_", " ") }}={{ "%.1f"|format(value) }}
-              {% endfor %}
-            </p>
-            <p class="score-row"><strong>Why it made the list:</strong> {{ ranked.why_included }}</p>
+            {% endif %}
+            {% if verbosity != "compact" %}
+            <details class="repo-details" {% if verbosity == "detailed" %}open{% endif %}>
+              <summary>{{ detail_summary }}</summary>
+              <div class="detail-lines">
+                <p class="stats-row">
+                  <strong>📊 Stats:</strong>
+                  {{ repo.stargazers_count }} stars,
+                  {{ repo.forks_count }} forks,
+                  {{ repo.open_issues_count }} open issues,
+                  {{ repo.watchers_count }} watchers
+                </p>
+                <p class="score-row">
+                  <strong>🧮 Score:</strong> {{ "%.2f"|format(ranked.score.total_score) }}
+                  {% for label, value in ranked.score.components.items() %}
+                  | {{ label.replace("_", " ") }}={{ "%.1f"|format(value) }}
+                  {% endfor %}
+                </p>
+                <p class="score-row"><strong>✅ Why it made the list:</strong> {{ ranked.why_included }}</p>
+              </div>
+            </details>
+            {% else %}
+            <p class="muted">↳ Details hidden in compact mode. Set `REPORT_VERBOSITY=standard` or `detailed` to expand.</p>
+            {% endif %}
           </div>
           {% endfor %}
         {% else %}
@@ -219,7 +251,7 @@
 
       {% if report.trend_analysis %}
       <div class="panel" id="trend-analysis">
-        <h2>Comprehensive Analysis of the Week's Trends</h2>
+        <h2>📈 Comprehensive Analysis of the Week's Trends</h2>
         <p><strong>{{ report.trend_analysis.headline }}</strong></p>
         <ul class="narrative-list">
           {% for paragraph in report.trend_analysis.narrative_sections %}
@@ -253,7 +285,7 @@
 
       {% if report.forecast_section %}
       <div class="panel" id="forecasts">
-        <h2>{{ report.forecast_section.headline }}</h2>
+        <h2>🔮 {{ report.forecast_section.headline }}</h2>
         <p>{{ report.forecast_section.intro }}</p>
         <div class="analysis-grid">
           {% for item in report.forecast_section.items %}
@@ -269,7 +301,7 @@
       {% endif %}
 
       <div class="panel" id="methodology">
-        <h2>Methodology</h2>
+        <h2>🧪 Methodology</h2>
         <ul class="methodology-list">
           {% for item in report.methodology %}
           <li>{{ item }}</li>
@@ -279,8 +311,11 @@
 
       <div class="footer">
         Generated by AudioRepoDigest v{{ report.version }}. This report is rendered directly in the email body with inline hyperlinks and a plaintext alternative.
+        <br />
+        Want to generate your own customized automated, scheduled report like this?
+        Check out my repo at
+        <a href="https://github.com/TheColby/AudioRepoDigest">https://github.com/TheColby/AudioRepoDigest</a>.
       </div>
     </div>
   </body>
 </html>
-

@@ -8,7 +8,7 @@ from croniter import croniter
 from pydantic import Field, ValidationInfo, field_validator, model_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict, YamlConfigSettingsSource
 
-from audiorepodigest.models import ReportFrequency
+from audiorepodigest.models import ReportFrequency, ReportVerbosity
 
 
 class DigestSettings(BaseSettings):
@@ -45,6 +45,10 @@ class DigestSettings(BaseSettings):
     report_cron: str | None = Field(default=None, validation_alias="REPORT_CRON")
     report_timezone: str = Field(default="America/New_York", validation_alias="REPORT_TIMEZONE")
     report_lookback_days: int = Field(default=7, validation_alias="REPORT_LOOKBACK_DAYS")
+    report_verbosity: ReportVerbosity = Field(
+        default=ReportVerbosity.STANDARD,
+        validation_alias="REPORT_VERBOSITY",
+    )
 
     top_n_main: int = Field(default=10, validation_alias="TOP_N_MAIN")
     top_n_new: int = Field(default=7, validation_alias="TOP_N_NEW")

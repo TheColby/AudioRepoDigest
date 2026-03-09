@@ -14,6 +14,7 @@ report_frequency: weekly
 report_cron: "0 13 * * 1"
 report_timezone: America/New_York
 report_lookback_days: 7
+report_verbosity: standard
 
 top_n_main: 10
 top_n_new: 7
@@ -41,4 +42,3 @@ blocklist_terms:
 output_html_path: artifacts/digest.html
 output_markdown_path: artifacts/digest.md
 output_json_path: artifacts/digest.json
-
