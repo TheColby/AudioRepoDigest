@@ -88,6 +88,15 @@
       .narrative-list li {
         margin-bottom: 4px;
       }
+      .toc-list {
+        list-style: none;
+        padding-left: 0;
+      }
+      .toc-link {
+        display: list-item;
+        list-style-position: inside;
+        margin-left: 0;
+      }
       .repo-card {
         border-top: 1px solid #e4ebf1;
         padding-top: 12px;
@@ -233,7 +242,7 @@
         <h2>🧭 Table of Contents</h2>
         <ul class="toc-list">
           {% for entry in report.toc %}
-          <li><a href="#{{ entry.anchor }}">{{ entry.title }}</a></li>
+          <a class="toc-link" href="#{{ entry.anchor }}">{{ entry.title }}</a>
           {% endfor %}
         </ul>
       </div>
