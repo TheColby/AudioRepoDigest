@@ -71,6 +71,9 @@
       .header strong {
         color: #f0fbf6 !important;
       }
+      .header h1 {
+        color: #000000 !important;
+      }
       .summary-box {
         background: #eef7ff;
         border-left: 4px solid #0b5cab;
@@ -133,27 +136,6 @@
       .analysis-grid {
         display: block;
       }
-      details.repo-details {
-        margin-top: 10px;
-        border: 1px solid #dbe4ea;
-        border-radius: 10px;
-        padding: 8px 10px;
-        background: #fbfdff;
-      }
-      details.repo-details summary {
-        cursor: pointer;
-        color: #274255;
-        font-weight: 600;
-      }
-      .detail-lines p {
-        margin: 6px 0 0 0;
-      }
-      details.repo-details .detail-lines {
-        display: none;
-      }
-      details.repo-details[open] .detail-lines {
-        display: block;
-      }
       .forecast-card {
         border: 1px solid #d7e0e7;
         border-radius: 12px;
@@ -209,13 +191,6 @@
           border-color: #33506a !important;
           color: #d8e8f7 !important;
         }
-        details.repo-details {
-          border-color: #2f465d !important;
-          background: #122132 !important;
-        }
-        details.repo-details summary {
-          color: #d2e3f4 !important;
-        }
         .forecast-card {
           background: #132334 !important;
           border-color: #2f465d !important;
@@ -242,8 +217,7 @@
       [data-ogsc] .score-row,
       [data-ogsc] .stats-row,
       [data-ogsc] .footer,
-      [data-ogsc] .header-line,
-      [data-ogsc] details.repo-details summary {
+      [data-ogsc] .header-line {
         color: #c7d5e3 !important;
       }
     </style>
@@ -276,7 +250,6 @@
         {% if section.entries %}
           {% for ranked in section.entries %}
           {% set repo = ranked.candidate %}
-          {% set detail_summary = "↳ Details" %}
           <div class="repo-card">
             <div class="repo-title">
               <span class="rank">#{{ ranked.rank }}</span>
@@ -288,35 +261,6 @@
               <span class="tag">{{ tag.replace("_", " ") }}</span>
               {% endfor %}
             </div>
-            {% if verbosity == "detailed" %}
-            <p class="meta">
-              👤 Owner: {{ repo.owner }}
-              {% if repo.language %} | 💻 Language: {{ repo.language }}{% endif %}
-              | 🏗️ Created: {{ repo.created_at.date().isoformat() }}
-              | 🔄 Updated: {{ repo.updated_at.date().isoformat() }}
-            </p>
-            {% endif %}
-            {% if verbosity != "compact" %}
-            <details class="repo-details">
-              <summary>{{ detail_summary }}</summary>
-              <div class="detail-lines">
-                <p class="stats-row">
-                  <strong>📊 Stats:</strong>
-                  {{ repo.stargazers_count }} stars,
-                  {{ repo.forks_count }} forks,
-                  {{ repo.open_issues_count }} open issues,
-                  {{ repo.watchers_count }} watchers
-                </p>
-                <p class="score-row">
-                  <strong>🧮 Score:</strong> {{ "%.2f"|format(ranked.score.total_score) }}
-                  {% for label, value in ranked.score.components.items() %}
-                  | {{ label.replace("_", " ") }}={{ "%.1f"|format(value) }}
-                  {% endfor %}
-                </p>
-                <p class="score-row"><strong>✅ Why it made the list:</strong> {{ ranked.why_included }}</p>
-              </div>
-            </details>
-            {% endif %}
           </div>
           {% endfor %}
         {% else %}

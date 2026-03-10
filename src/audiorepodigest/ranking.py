@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+import random
 from datetime import datetime
 
 from audiorepodigest.models import (
@@ -234,6 +235,43 @@ class RankingEngine:
         )
         return self._to_ranked(scored[:limit], CategoryKey.HONORABLE_MENTIONS, period)
 
+    def select_random_audio(
+        self,
+        repositories: list[RepositoryCandidate],
+        period: DateRange,
+        *,
+        exclude: set[str],
+        limit: int = 5,
+    ) -> list[RankedRepository]:
+        eligible = [
+            repository
+            for repository in repositories
+            if repository.full_name not in exclude
+            and repository.classification
+            and repository.classification.is_relevant
+            and not repository.archived
+            and not repository.fork
+        ]
+        if not eligible:
+            return []
+
+        sample_size = min(limit, len(eligible))
+        seed = int(period.start.timestamp())
+        picks = random.Random(seed).sample(eligible, sample_size)
+        scored = [
+            (
+                repository,
+                ScoreBreakdown(
+                    category=CategoryKey.RANDOM_AUDIO,
+                    total_score=0.0,
+                    components={},
+                    explanation="Randomly selected from relevant candidates.",
+                ),
+            )
+            for repository in picks
+        ]
+        return self._to_ranked(scored, CategoryKey.RANDOM_AUDIO, period)
+
     def _to_ranked(
         self,
         scored: list[tuple[RepositoryCandidate, ScoreBreakdown]],
@@ -261,6 +299,8 @@ class RankingEngine:
             reasons.append("created during the reporting window")
         if category is CategoryKey.TOP_AUDIO_AI and repository.classification:
             reasons.append("clear audio-AI relevance")
+        if category is CategoryKey.RANDOM_AUDIO:
+            reasons.append("randomly selected from this week's relevant audio candidates")
         if repository.stargazers_count:
             reasons.append(f"{repository.stargazers_count} stars")
         if repository.forks_count:

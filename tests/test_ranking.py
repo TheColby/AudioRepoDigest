@@ -49,3 +49,25 @@ def test_top_new_only_includes_repositories_created_within_period(period) -> Non
     ranked = RankingEngine().rank_top_new([old_repo, new_repo], period, 5)
     assert [entry.candidate.full_name for entry in ranked] == ["acme/new-music-tool"]
     assert "created during the reporting window" in ranked[0].why_included
+
+
+def test_random_audio_selection_respects_exclusions(period) -> None:
+    repositories = [
+        make_repository(
+            full_name=f"acme/audio-random-{index}",
+            description="Audio repository candidate for random weekly section.",
+            topics=["audio", "dsp"],
+            stars=50 + index,
+        )
+        for index in range(8)
+    ]
+    excluded = {"acme/audio-random-1", "acme/audio-random-2"}
+
+    ranked = RankingEngine().select_random_audio(
+        repositories,
+        period,
+        exclude=excluded,
+        limit=5,
+    )
+    assert len(ranked) == 5
+    assert all(item.candidate.full_name not in excluded for item in ranked)

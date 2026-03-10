@@ -25,6 +25,7 @@ class CategoryKey(StrEnum):
     TOP_AUDIO = "top_audio"
     TOP_NEW = "top_new"
     TOP_AUDIO_AI = "top_audio_ai"
+    RANDOM_AUDIO = "random_audio"
     HONORABLE_MENTIONS = "honorable_mentions"
 
 

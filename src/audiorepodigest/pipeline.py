@@ -49,7 +49,13 @@ class AudioRepoDigestPipeline:
         categories: Iterable[CategoryKey] | None = None,
     ) -> PipelineResult:
         selected_categories = list(
-            categories or (CategoryKey.TOP_AUDIO, CategoryKey.TOP_NEW, CategoryKey.TOP_AUDIO_AI)
+            categories
+            or (
+                CategoryKey.TOP_AUDIO,
+                CategoryKey.TOP_NEW,
+                CategoryKey.TOP_AUDIO_AI,
+                CategoryKey.RANDOM_AUDIO,
+            )
         )
         effective_period = period or resolve_period(
             frequency=self.settings.report_frequency,
@@ -87,6 +93,17 @@ class AudioRepoDigestPipeline:
             )
             sections.append(build_section(CategoryKey.TOP_AUDIO_AI, top_audio_ai))
             selected_names.update(item.candidate.full_name for item in top_audio_ai)
+
+        if CategoryKey.RANDOM_AUDIO in selected_categories:
+            random_audio = self.ranking.select_random_audio(
+                discovery.candidates,
+                effective_period,
+                exclude=selected_names,
+                limit=5,
+            )
+            if random_audio:
+                sections.append(build_section(CategoryKey.RANDOM_AUDIO, random_audio))
+                selected_names.update(item.candidate.full_name for item in random_audio)
 
         if self.settings.include_honorable_mentions:
             honorable_exclude = (

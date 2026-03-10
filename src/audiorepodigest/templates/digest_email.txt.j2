@@ -15,14 +15,6 @@ Colby's AudioRepoDigest
 URL: {{ ranked.candidate.html_url }}
 📝 Description: {{ ranked.candidate.description or "No description provided." }}
 🏷️ Tags: {{ ", ".join(ranked.candidate.primary_tags) or "n/a" }}
-{% if verbosity == "detailed" %}
-👤 Owner: {{ ranked.candidate.owner }} | 💻 Language: {{ ranked.candidate.language or "n/a" }} | 🏗️ Created: {{ ranked.candidate.created_at.date().isoformat() }} | 🔄 Updated: {{ ranked.candidate.updated_at.date().isoformat() }}
-📊 Stats: {{ ranked.candidate.stargazers_count }} stars, {{ ranked.candidate.forks_count }} forks, {{ ranked.candidate.open_issues_count }} open issues, {{ ranked.candidate.watchers_count }} watchers
-🧮 Score: {{ "%.2f"|format(ranked.score.total_score) }} | {% for label, value in ranked.score.components.items() %}{% if not loop.first %} | {% endif %}{{ label.replace("_", " ") }}={{ "%.1f"|format(value) }}{% endfor %}
-✅ Why it made the list: {{ ranked.why_included }}
-{% elif verbosity == "standard" %}
-↳ Details available in HTML version.
-{% endif %}
 
 {% endfor %}
 {% else %}

@@ -26,6 +26,7 @@ SECTION_TITLES = {
     CategoryKey.TOP_AUDIO: "🎵 Top Audio Repos",
     CategoryKey.TOP_NEW: "🆕 Top New Audio/Music Repos",
     CategoryKey.TOP_AUDIO_AI: "🤖 Top Audio AI Repos",
+    CategoryKey.RANDOM_AUDIO: "🎲 5 Random Audio GitHubs of the Week",
     CategoryKey.HONORABLE_MENTIONS: "⭐ Honorable Mentions",
 }
 
@@ -324,6 +325,7 @@ def build_section(
             "Repositories centered on speech, generative audio, music AI, voice "
             "tooling, or adjacent audio-ML infrastructure."
         ),
+        CategoryKey.RANDOM_AUDIO: "A rotating set of relevant audio repos selected at random.",
         CategoryKey.HONORABLE_MENTIONS: (
             "Additional repositories worth scanning even if they did not make the "
             "core ranked sections."

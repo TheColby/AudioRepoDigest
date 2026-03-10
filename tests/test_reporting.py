@@ -16,5 +16,5 @@ def test_renderer_outputs_html_text_and_markdown(rendered_report_bundle) -> None
     assert "EXECUTIVE SUMMARY" not in bundle.text
     assert report.sections[0].entries[0].candidate.html_url in bundle.html
     assert report.sections[0].entries[0].candidate.html_url in bundle.text
-    assert "↳ Details" in bundle.html
+    assert "Stats:" not in bundle.html
     assert "Where Things Are Headed" in bundle.markdown
