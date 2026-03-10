@@ -31,7 +31,7 @@ def test_load_settings_from_environment(monkeypatch: pytest.MonkeyPatch) -> None
     settings = load_settings()
     assert settings.report_frequency is ReportFrequency.WEEKLY
     assert settings.report_recipient_email == "colbyleider@gmail.com"
-    assert settings.effective_cron == "0 13 * * 1"
+    assert settings.effective_cron == "0 20 * * 0"
 
 
 def test_load_settings_merges_yaml_and_env(

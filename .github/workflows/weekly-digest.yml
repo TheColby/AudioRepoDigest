@@ -2,7 +2,7 @@ name: AudioRepoDigest
 
 on:
   schedule:
-    - cron: "0 13 * * 1"
+    - cron: "0 20 * * 0"
   workflow_dispatch:
     inputs:
       recipient_email:
@@ -96,7 +96,7 @@ jobs:
           REPORT_RECIPIENT_EMAIL: ${{ github.event.inputs.recipient_email || secrets.REPORT_RECIPIENT_EMAIL }}
           REPORT_RECIPIENT_NAME: ${{ github.event.inputs.recipient_name || secrets.REPORT_RECIPIENT_NAME }}
           REPORT_FREQUENCY: ${{ secrets.REPORT_FREQUENCY || 'weekly' }}
-          REPORT_CRON: ${{ secrets.REPORT_CRON || '0 13 * * 1' }}
+          REPORT_CRON: ${{ secrets.REPORT_CRON || '0 20 * * 0' }}
           REPORT_TIMEZONE: ${{ secrets.REPORT_TIMEZONE || 'America/New_York' }}
           REPORT_VERBOSITY: ${{ secrets.REPORT_VERBOSITY || 'standard' }}
           TOP_N_MAIN: ${{ secrets.TOP_N_MAIN || '10' }}

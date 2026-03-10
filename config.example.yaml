@@ -11,7 +11,7 @@ smtp_use_ssl: false
 report_recipient_email: colbyleider@gmail.com
 report_recipient_name: Colby Leider
 report_frequency: weekly
-report_cron: "0 13 * * 1"
+report_cron: "0 20 * * 0"
 report_timezone: America/New_York
 report_lookback_days: 7
 report_verbosity: standard

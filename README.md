@@ -6,7 +6,7 @@ AudioRepoDigest discovers and ranks relevant GitHub repositories, then emails th
 
 ## What You Get
 
-- Weekly-by-default scheduled report (`0 13 * * 1`, Monday morning UTC)
+- Weekly-by-default scheduled report (`0 20 * * 0`, Sunday afternoon default)
 - Ranked sections:
   - Top Audio Repos
   - Top New Audio/Music Repos
@@ -138,4 +138,3 @@ src/audiorepodigest/
 ## License
 
 MIT. See [LICENSE](/Users/cleider/dev/AudioRepoDigest/LICENSE).
-

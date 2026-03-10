@@ -145,7 +145,7 @@ class DigestSettings(BaseSettings):
             return "0 13 1 * *"
         if self.report_frequency is ReportFrequency.CUSTOM:
             return "0 13 * * 1"
-        return "0 13 * * 1"
+        return "0 20 * * 0"
 
 
 def load_settings(
