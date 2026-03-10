@@ -32,7 +32,7 @@
         margin-bottom: 12px;
       }
       .header {
-        background: linear-gradient(135deg, #0f3f2f 0%, #18513d 100%);
+        background: #0abab5;
       }
       .eyebrow {
         font-size: 12px;
@@ -62,17 +62,14 @@
         font-size: 14px;
       }
       .header-line {
-        color: #e2f2ea;
+        color: #ffffff;
         font-size: 14px;
       }
       .header h1,
       .header .muted,
       .header .eyebrow,
       .header strong {
-        color: #f0fbf6 !important;
-      }
-      .header h1 {
-        color: #000000 !important;
+        color: #ffffff !important;
       }
       .summary-box {
         background: #eef7ff;
@@ -168,7 +165,7 @@
           border-color: #2a3b4f !important;
         }
         .header {
-          background: linear-gradient(135deg, #0e3328 0%, #174736 100%) !important;
+          background: #0abab5 !important;
         }
         .eyebrow,
         .muted,
@@ -205,7 +202,7 @@
         border-color: #2a3b4f !important;
       }
       [data-ogsc] .header {
-        background: #174736 !important;
+        background: #0abab5 !important;
       }
       [data-ogsc] .summary-box {
         background: #10233a !important;
@@ -228,9 +225,6 @@
         <p class="eyebrow">🎧 AudioRepoDigest</p>
         <h1>{{ report.title }}</h1>
         <p class="header-line">
-          <strong>🗓️ Report period:</strong> {{ period_label }} |
-          <strong>⏱️ Generated:</strong> {{ generated_at_label }} |
-          <strong>👤 Recipient:</strong> {{ report.recipient_name }} |
           <strong>📊 Scanned:</strong> {{ report.metadata["raw_candidate_count"] }} raw, {{ report.scanned_candidate_count }} relevant, {{ report.selected_repo_count }} selected
         </p>
       </div>
