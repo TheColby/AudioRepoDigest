@@ -60,6 +60,13 @@ Set SMTP password securely (prompted):
 gh secret set SMTP_PASSWORD -R TheColby/AudioRepoDigest
 ```
 
+Gmail note:
+
+- `SMTP_USERNAME` should be your full Gmail address.
+- `SMTP_PASSWORD` should be a Google App Password, not your normal Gmail password.
+- If you paste the App Password with spaces, AudioRepoDigest strips them automatically for Gmail.
+- A `535 5.7.8 Username and Password not accepted` error usually means the App Password was revoked, expired, or created under a different Google account.
+
 Optional GitHub token:
 
 ```bash

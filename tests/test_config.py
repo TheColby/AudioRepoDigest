@@ -11,6 +11,15 @@ from audiorepodigest.models import ReportFrequency
 
 
 def _set_required_env(monkeypatch: pytest.MonkeyPatch) -> None:
+    for key in (
+        "REPORT_FREQUENCY",
+        "REPORT_CRON",
+        "REPORT_TIMEZONE",
+        "OUTPUT_HTML_PATH",
+        "OUTPUT_MARKDOWN_PATH",
+        "OUTPUT_JSON_PATH",
+    ):
+        monkeypatch.delenv(key, raising=False)
     values = {
         "GITHUB_TOKEN": "ghp_test",
         "SMTP_HOST": "smtp.example.com",
@@ -25,7 +34,10 @@ def _set_required_env(monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.setenv(key, value)
 
 
-def test_load_settings_from_environment(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_load_settings_from_environment(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    monkeypatch.chdir(tmp_path)
     _set_required_env(monkeypatch)
     monkeypatch.setenv("REPORT_FREQUENCY", "weekly")
     settings = load_settings()
@@ -38,6 +50,7 @@ def test_load_settings_merges_yaml_and_env(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
+    monkeypatch.chdir(tmp_path)
     _set_required_env(monkeypatch)
     monkeypatch.setenv("SMTP_HOST", "smtp.override.example.com")
     config_path = tmp_path / "config.yaml"
@@ -58,9 +71,27 @@ def test_load_settings_merges_yaml_and_env(
     assert settings.top_n_main == 22
 
 
-def test_custom_frequency_requires_cron(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_custom_frequency_requires_cron(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    monkeypatch.chdir(tmp_path)
     _set_required_env(monkeypatch)
     monkeypatch.setenv("REPORT_FREQUENCY", "custom")
     monkeypatch.delenv("REPORT_CRON", raising=False)
     with pytest.raises(ValidationError):
         load_settings()
+
+
+def test_gmail_password_whitespace_is_normalized(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    _set_required_env(monkeypatch)
+    monkeypatch.setenv("SMTP_HOST", "smtp.gmail.com")
+    monkeypatch.setenv("SMTP_USERNAME", " colbyleider@gmail.com ")
+    monkeypatch.setenv("SMTP_PASSWORD", " abcd efgh ijkl mnop ")
+
+    settings = load_settings()
+
+    assert settings.smtp_username == "colbyleider@gmail.com"
+    assert settings.smtp_password == "abcdefghijklmnop"

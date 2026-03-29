@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import smtplib
+import ssl
 from email.message import EmailMessage
 from email.utils import formataddr
 
@@ -37,24 +38,30 @@ class EmailSender:
         return message
 
     def send_message(self, message: EmailMessage) -> None:
-        if self.settings.smtp_use_ssl:
-            with smtplib.SMTP_SSL(
-                self.settings.smtp_host,
-                self.settings.smtp_port,
-                timeout=30,
-            ) as smtp:
-                smtp.login(self.settings.smtp_username, self.settings.smtp_password)
-                smtp.send_message(message)
-        else:
-            with smtplib.SMTP(
-                self.settings.smtp_host,
-                self.settings.smtp_port,
-                timeout=30,
-            ) as smtp:
-                if self.settings.smtp_use_starttls:
-                    smtp.starttls()
-                smtp.login(self.settings.smtp_username, self.settings.smtp_password)
-                smtp.send_message(message)
+        try:
+            if self.settings.smtp_use_ssl:
+                with smtplib.SMTP_SSL(
+                    self.settings.smtp_host,
+                    self.settings.smtp_port,
+                    timeout=30,
+                    context=ssl.create_default_context(),
+                ) as smtp:
+                    smtp.login(self.settings.smtp_username, self.settings.smtp_password)
+                    smtp.send_message(message)
+            else:
+                with smtplib.SMTP(
+                    self.settings.smtp_host,
+                    self.settings.smtp_port,
+                    timeout=30,
+                ) as smtp:
+                    smtp.ehlo()
+                    if self.settings.smtp_use_starttls:
+                        smtp.starttls(context=ssl.create_default_context())
+                        smtp.ehlo()
+                    smtp.login(self.settings.smtp_username, self.settings.smtp_password)
+                    smtp.send_message(message)
+        except smtplib.SMTPAuthenticationError as exc:
+            raise RuntimeError(self._build_authentication_error_message()) from exc
         logger.info("Email delivered to %s", message["To"])
 
     def send_render_bundle(
@@ -73,3 +80,22 @@ class EmailSender:
         )
         self.send_message(message)
         return message
+
+    def _build_authentication_error_message(self) -> str:
+        host = self.settings.smtp_host
+        username = self.settings.smtp_username
+        if host.lower() == "smtp.gmail.com":
+            return (
+                "SMTP authentication failed for smtp.gmail.com. "
+                "Check the GitHub Actions secrets `SMTP_USERNAME`, `SMTP_PASSWORD`, and `SMTP_FROM`. "
+                "For Gmail, `SMTP_USERNAME` should be the full Gmail address and `SMTP_PASSWORD` should be "
+                "a current Google App Password created after enabling 2-Step Verification. "
+                "If you pasted the App Password with spaces, AudioRepoDigest now strips them automatically, "
+                "so a remaining failure usually means the App Password is expired, revoked, or tied to a "
+                "different Google account than "
+                f"`{username}`."
+            )
+        return (
+            f"SMTP authentication failed for {host}. "
+            "Check the GitHub Actions secrets `SMTP_USERNAME`, `SMTP_PASSWORD`, and `SMTP_FROM`."
+        )

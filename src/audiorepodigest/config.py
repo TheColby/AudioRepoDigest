@@ -11,6 +11,12 @@ from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict, YamlCo
 from audiorepodigest.models import ReportFrequency, ReportVerbosity
 
 
+def _normalize_string(value: object) -> object:
+    if isinstance(value, str):
+        return value.strip()
+    return value
+
+
 class DigestSettings(BaseSettings):
     """Runtime configuration for AudioRepoDigest."""
 
@@ -112,6 +118,23 @@ class DigestSettings(BaseSettings):
             return [item.strip() for item in value.split(",") if item.strip()]
         return value
 
+    @field_validator(
+        "github_token",
+        "smtp_host",
+        "smtp_username",
+        "smtp_password",
+        "smtp_from",
+        "report_recipient_email",
+        "report_recipient_name",
+        "report_timezone",
+        "log_level",
+        "email_subject_prefix",
+        mode="before",
+    )
+    @classmethod
+    def _strip_strings(cls, value: object) -> object:
+        return _normalize_string(value)
+
     @field_validator("report_timezone")
     @classmethod
     def _validate_timezone(cls, value: str) -> str:
@@ -133,6 +156,8 @@ class DigestSettings(BaseSettings):
     def _validate_transport_flags(self) -> DigestSettings:
         if self.smtp_use_starttls and self.smtp_use_ssl:
             raise ValueError("SMTP_USE_STARTTLS and SMTP_USE_SSL cannot both be enabled.")
+        if self.smtp_host.lower() == "smtp.gmail.com":
+            self.smtp_password = "".join(self.smtp_password.split())
         return self
 
     @property
