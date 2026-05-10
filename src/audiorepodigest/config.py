@@ -161,6 +161,14 @@ class DigestSettings(BaseSettings):
         return self
 
     @property
+    def report_recipient_emails(self) -> list[str]:
+        return [
+            item.strip()
+            for item in self.report_recipient_email.split(",")
+            if item.strip()
+        ]
+
+    @property
     def effective_cron(self) -> str:
         if self.report_cron:
             return self.report_cron

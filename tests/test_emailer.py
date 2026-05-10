@@ -101,3 +101,21 @@ def test_simple_message_contains_standard_headers(settings) -> None:
     assert message["Reply-To"] == settings.smtp_from
     assert message["X-Mailer"] == "AudioRepoDigest"
     assert message.is_multipart()
+
+
+def test_render_bundle_is_sent_to_multiple_recipients(monkeypatch: pytest.MonkeyPatch, settings, rendered_report_bundle) -> None:
+    settings.report_recipient_email = "colby@leider.org, colbyleider@gmail.com"
+    report, bundle = rendered_report_bundle
+    delivered_to: list[str] = []
+
+    def fake_send_message(self, message) -> None:
+        delivered_to.append(str(message["To"]))
+
+    monkeypatch.setattr(EmailSender, "send_message", fake_send_message)
+
+    EmailSender(settings).send_render_bundle(report, bundle)
+
+    assert delivered_to == [
+        "Colby Leider <colby@leider.org>",
+        "Colby Leider <colbyleider@gmail.com>",
+    ]

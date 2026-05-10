@@ -118,14 +118,39 @@ class EmailSender:
         recipient_email: str | None = None,
         recipient_name: str | None = None,
     ) -> EmailMessage:
-        message = self.build_message(
-            report,
-            render_bundle,
-            recipient_email=recipient_email,
-            recipient_name=recipient_name,
-        )
-        self.send_message(message)
-        return message
+        messages: list[EmailMessage] = []
+        for email in self._resolve_recipient_emails(recipient_email):
+            message = self.build_message(
+                report,
+                render_bundle,
+                recipient_email=email,
+                recipient_name=recipient_name,
+            )
+            self.send_message(message)
+            messages.append(message)
+        return messages[-1]
+
+    def send_simple_email(
+        self,
+        *,
+        subject: str,
+        text: str,
+        html: str,
+        recipient_email: str | None = None,
+        recipient_name: str | None = None,
+    ) -> EmailMessage:
+        messages: list[EmailMessage] = []
+        for email in self._resolve_recipient_emails(recipient_email):
+            message = self.build_simple_message(
+                subject=subject,
+                text=text,
+                html=html,
+                recipient_email=email,
+                recipient_name=recipient_name,
+            )
+            self.send_message(message)
+            messages.append(message)
+        return messages[-1]
 
     def _build_authentication_error_message(self) -> str:
         host = self.settings.smtp_host
@@ -154,3 +179,10 @@ class EmailSender:
         if "@" in username:
             return username.split("@", 1)[1]
         return "localhost"
+
+    def _resolve_recipient_emails(self, override: str | None) -> list[str]:
+        raw_value = override or self.settings.report_recipient_email
+        emails = [item.strip() for item in raw_value.split(",") if item.strip()]
+        if not emails:
+            raise ValueError("At least one recipient email must be configured.")
+        return emails

@@ -111,6 +111,11 @@ gh workflow run email-heartbeat.yml -R TheColby/AudioRepoDigest
 gh run list -R TheColby/AudioRepoDigest --workflow email-heartbeat.yml
 ```
 
+Multiple recipients:
+
+- `REPORT_RECIPIENT_EMAIL` can be a comma-separated list such as `colby@leider.org, colbyleider@gmail.com`
+- AudioRepoDigest sends a separate email to each listed recipient
+
 ## Report Verbosity
 
 Use `REPORT_VERBOSITY`:

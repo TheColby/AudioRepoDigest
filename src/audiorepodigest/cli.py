@@ -196,14 +196,13 @@ def send_heartbeat_email(
         "</div></body></html>"
     )
     sender = EmailSender(settings)
-    message = sender.build_simple_message(
+    sender.send_simple_email(
         subject=subject,
         text=text,
         html=html,
         recipient_email=recipient_email,
         recipient_name=recipient_name,
     )
-    sender.send_message(message)
 
 
 @app.command("validate-config")
@@ -215,7 +214,11 @@ def validate_config(
     table.add_column("Key")
     table.add_column("Value")
     table.add_row(
-        "Recipient", f"{settings.report_recipient_name} <{settings.report_recipient_email}>"
+        "Recipients",
+        ", ".join(
+            f"{settings.report_recipient_name} <{email}>"
+            for email in settings.report_recipient_emails
+        ),
     )
     table.add_row("Frequency", settings.report_frequency.value)
     table.add_row("Effective cron", settings.effective_cron)

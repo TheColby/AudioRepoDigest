@@ -95,3 +95,21 @@ def test_gmail_password_whitespace_is_normalized(
 
     assert settings.smtp_username == "colbyleider@gmail.com"
     assert settings.smtp_password == "abcdefghijklmnop"
+
+
+def test_multiple_recipient_emails_are_parsed(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    _set_required_env(monkeypatch)
+    monkeypatch.setenv(
+        "REPORT_RECIPIENT_EMAIL",
+        "colby@leider.org, colbyleider@gmail.com",
+    )
+
+    settings = load_settings()
+
+    assert settings.report_recipient_emails == [
+        "colby@leider.org",
+        "colbyleider@gmail.com",
+    ]
