@@ -32,18 +32,56 @@ class EmailSender:
         to_name = recipient_name or report.recipient_name
 
         message = EmailMessage()
-        message["Subject"] = render_bundle.subject
+        self._apply_standard_headers(
+            message,
+            subject=render_bundle.subject,
+            recipient_email=to_email,
+            recipient_name=to_name,
+        )
+        message.set_content(render_bundle.text)
+        message.add_alternative(render_bundle.html, subtype="html")
+        return message
+
+    def build_simple_message(
+        self,
+        *,
+        subject: str,
+        text: str,
+        html: str,
+        recipient_email: str | None = None,
+        recipient_name: str | None = None,
+    ) -> EmailMessage:
+        to_email = recipient_email or self.settings.report_recipient_email
+        to_name = recipient_name or self.settings.report_recipient_name
+
+        message = EmailMessage()
+        self._apply_standard_headers(
+            message,
+            subject=subject,
+            recipient_email=to_email,
+            recipient_name=to_name,
+        )
+        message.set_content(text)
+        message.add_alternative(html, subtype="html")
+        return message
+
+    def _apply_standard_headers(
+        self,
+        message: EmailMessage,
+        *,
+        subject: str,
+        recipient_email: str,
+        recipient_name: str,
+    ) -> None:
+        message["Subject"] = subject
         message["From"] = self.settings.smtp_from
-        message["To"] = formataddr((to_name, to_email))
+        message["To"] = formataddr((recipient_name, recipient_email))
         message["Date"] = format_datetime(datetime.now().astimezone())
         message["Message-ID"] = make_msgid(domain=self._message_id_domain())
         message["Reply-To"] = self._reply_to_header()
         message["Auto-Submitted"] = "auto-generated"
         message["X-Auto-Response-Suppress"] = "All"
         message["X-Mailer"] = "AudioRepoDigest"
-        message.set_content(render_bundle.text)
-        message.add_alternative(render_bundle.html, subtype="html")
-        return message
 
     def send_message(self, message: EmailMessage) -> None:
         try:

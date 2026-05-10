@@ -87,3 +87,17 @@ def test_gmail_auth_error_has_actionable_message(
 
     with pytest.raises(RuntimeError, match="Google App Password"):
         sender.send_message(message)
+
+
+def test_simple_message_contains_standard_headers(settings) -> None:
+    message = EmailSender(settings).build_simple_message(
+        subject="[AudioRepoDigest] Heartbeat",
+        text="Heartbeat",
+        html="<p>Heartbeat</p>",
+    )
+
+    assert message["Subject"] == "[AudioRepoDigest] Heartbeat"
+    assert message["To"] == "Colby Leider <colbyleider@gmail.com>"
+    assert message["Reply-To"] == settings.smtp_from
+    assert message["X-Mailer"] == "AudioRepoDigest"
+    assert message.is_multipart()

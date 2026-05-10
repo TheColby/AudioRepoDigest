@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime
 from pathlib import Path
 from typing import Annotated
 
@@ -160,6 +161,49 @@ def send_test_email(
             recipient_email=recipient_email,
             recipient_name=recipient_name,
         )
+
+
+@app.command("send-heartbeat-email")
+def send_heartbeat_email(
+    config: Annotated[Path | None, typer.Option(help="Optional YAML config path.")] = None,
+    recipient_email: Annotated[
+        str | None, typer.Option(help="Override recipient email for testing.")
+    ] = None,
+    recipient_name: Annotated[
+        str | None, typer.Option(help="Override recipient name for testing.")
+    ] = None,
+) -> None:
+    settings = _load_runtime(config)
+    now = datetime.now().astimezone()
+    timestamp = now.strftime("%Y-%m-%d %H:%M %Z")
+    subject = f"{settings.email_subject_prefix} Heartbeat | {timestamp}"
+    text = (
+        "AudioRepoDigest heartbeat\n\n"
+        f"Sent: {timestamp}\n"
+        f"Recipient: {recipient_name or settings.report_recipient_name}\n"
+        "This is a lightweight delivery check separate from the full digest.\n"
+    )
+    html = (
+        "<html><body style=\"font-family:Arial,sans-serif;background:#f7faf9;color:#123;\">"
+        "<div style=\"max-width:620px;margin:0 auto;padding:24px;\">"
+        "<h1 style=\"margin:0 0 12px;font-size:24px;color:#0f5c50;\">AudioRepoDigest Heartbeat</h1>"
+        f"<p style=\"margin:0 0 8px;\"><strong>Sent:</strong> {timestamp}</p>"
+        f"<p style=\"margin:0 0 8px;\"><strong>Recipient:</strong> "
+        f"{recipient_name or settings.report_recipient_name}</p>"
+        "<p style=\"margin:16px 0 0;\">"
+        "This is a lightweight delivery check separate from the full digest."
+        "</p>"
+        "</div></body></html>"
+    )
+    sender = EmailSender(settings)
+    message = sender.build_simple_message(
+        subject=subject,
+        text=text,
+        html=html,
+        recipient_email=recipient_email,
+        recipient_name=recipient_name,
+    )
+    sender.send_message(message)
 
 
 @app.command("validate-config")

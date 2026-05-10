@@ -23,6 +23,7 @@ AudioRepoDigest discovers and ranks relevant GitHub repositories, then emails th
 4. Run again with `dry_run=false` to send email.
 
 Workflow file: [weekly-digest.yml](/Users/cleider/dev/AudioRepoDigest/.github/workflows/weekly-digest.yml)
+Heartbeat workflow: [email-heartbeat.yml](/Users/cleider/dev/AudioRepoDigest/.github/workflows/email-heartbeat.yml)
 
 ## Required GitHub Secrets
 
@@ -101,6 +102,13 @@ Then send a live report:
 
 ```bash
 gh workflow run weekly-digest.yml -R TheColby/AudioRepoDigest -f dry_run=false
+```
+
+Manual heartbeat:
+
+```bash
+gh workflow run email-heartbeat.yml -R TheColby/AudioRepoDigest
+gh run list -R TheColby/AudioRepoDigest --workflow email-heartbeat.yml
 ```
 
 ## Report Verbosity
