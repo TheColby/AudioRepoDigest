@@ -81,7 +81,7 @@ class DigestSettings(BaseSettings):
 
     log_level: str = Field(default="INFO", validation_alias="LOG_LEVEL")
     email_subject_prefix: str = Field(
-        default="[AudioRepoDigest]", validation_alias="EMAIL_SUBJECT_PREFIX"
+        default="[COLBY AUDIO DIGEST]", validation_alias="EMAIL_SUBJECT_PREFIX"
     )
     allowlist_topics: Annotated[list[str], NoDecode] = Field(
         default_factory=list,

@@ -91,7 +91,7 @@ def settings(tmp_path) -> DigestSettings:
             "max_candidates_to_scan": 100,
             "github_search_window_days": 21,
             "log_level": "INFO",
-            "email_subject_prefix": "[AudioRepoDigest]",
+            "email_subject_prefix": "[COLBY AUDIO DIGEST]",
             "output_html_path": tmp_path / "digest.html",
             "output_markdown_path": tmp_path / "digest.md",
             "output_json_path": tmp_path / "digest.json",

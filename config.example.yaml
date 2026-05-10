@@ -27,7 +27,7 @@ max_candidates_to_scan: 180
 github_search_window_days: 21
 readme_fallback_limit: 6
 
-email_subject_prefix: "[AudioRepoDigest]"
+email_subject_prefix: "[COLBY AUDIO DIGEST]"
 allowlist_topics:
   - audio
   - music

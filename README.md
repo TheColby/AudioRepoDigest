@@ -79,7 +79,7 @@ Optional readability/behavior settings:
 ```bash
 gh secret set REPORT_TIMEZONE -R TheColby/AudioRepoDigest -b "America/New_York"
 gh secret set REPORT_VERBOSITY -R TheColby/AudioRepoDigest -b "compact"
-gh secret set EMAIL_SUBJECT_PREFIX -R TheColby/AudioRepoDigest -b "[AudioRepoDigest]"
+gh secret set EMAIL_SUBJECT_PREFIX -R TheColby/AudioRepoDigest -b "[COLBY AUDIO DIGEST]"
 ```
 
 ## Trigger Workflow
