@@ -16,6 +16,11 @@ def test_email_message_contains_text_and_html_alternatives(
 
     assert message["Subject"] == bundle.subject
     assert message["To"] == "Colby Leider <colbyleider@gmail.com>"
+    assert message["Reply-To"] == settings.smtp_from
+    assert message["Auto-Submitted"] == "auto-generated"
+    assert message["X-Mailer"] == "AudioRepoDigest"
+    assert message["Message-ID"] is not None
+    assert message["Date"] is not None
     assert message.is_multipart()
     payload = message.get_payload()
     assert payload[0].get_content_type() == "text/plain"

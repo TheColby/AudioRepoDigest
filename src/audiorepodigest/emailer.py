@@ -3,7 +3,9 @@ from __future__ import annotations
 import smtplib
 import ssl
 from email.message import EmailMessage
-from email.utils import formataddr
+from email.utils import format_datetime, formataddr, make_msgid
+
+from datetime import datetime
 
 from audiorepodigest.config import DigestSettings
 from audiorepodigest.logging import get_logger
@@ -33,6 +35,12 @@ class EmailSender:
         message["Subject"] = render_bundle.subject
         message["From"] = self.settings.smtp_from
         message["To"] = formataddr((to_name, to_email))
+        message["Date"] = format_datetime(datetime.now().astimezone())
+        message["Message-ID"] = make_msgid(domain=self._message_id_domain())
+        message["Reply-To"] = self._reply_to_header()
+        message["Auto-Submitted"] = "auto-generated"
+        message["X-Auto-Response-Suppress"] = "All"
+        message["X-Mailer"] = "AudioRepoDigest"
         message.set_content(render_bundle.text)
         message.add_alternative(render_bundle.html, subtype="html")
         return message
@@ -62,7 +70,7 @@ class EmailSender:
                     smtp.send_message(message)
         except smtplib.SMTPAuthenticationError as exc:
             raise RuntimeError(self._build_authentication_error_message()) from exc
-        logger.info("Email delivered to %s", message["To"])
+        logger.info("Email delivered to %s with subject %s", message["To"], message["Subject"])
 
     def send_render_bundle(
         self,
@@ -99,3 +107,12 @@ class EmailSender:
             f"SMTP authentication failed for {host}. "
             "Check the GitHub Actions secrets `SMTP_USERNAME`, `SMTP_PASSWORD`, and `SMTP_FROM`."
         )
+
+    def _reply_to_header(self) -> str:
+        return self.settings.smtp_from
+
+    def _message_id_domain(self) -> str:
+        username = self.settings.smtp_username.strip()
+        if "@" in username:
+            return username.split("@", 1)[1]
+        return "localhost"
