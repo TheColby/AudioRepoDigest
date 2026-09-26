@@ -127,7 +127,7 @@ Use `REPORT_VERBOSITY`:
 
 ## Weekly Repo Ideas
 
-Every digest includes `5 Repo Ideas to Build This Week`. The ideas are generated without an LLM: the system maps dominant weekly tags and gaps in the scanned ecosystem to practical project archetypes, with a recommended first release and the relevant weekly signal.
+Every digest includes `10 Repo Ideas to Build This Week`. The ideas are generated without an LLM: the system maps dominant weekly tags and gaps in the scanned ecosystem to practical project archetypes, with a recommended first release and the relevant weekly signal.
 
 Set `INCLUDE_REPO_IDEAS=false` to disable this section.
 

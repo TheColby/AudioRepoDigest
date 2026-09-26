@@ -64,6 +64,12 @@ IDEA_TEMPLATES: dict[str, tuple[str, str, str]] = {
         "inconsistencies, and unsafe routing assumptions.",
         "Ship a MIDI-first validator with clear repair suggestions.",
     ),
+    "midi": (
+        "MIDI Performance Inspector",
+        "A practical analyzer that turns MIDI files into timing, velocity, density, and "
+        "arrangement diagnostics for musicians and developers.",
+        "Ship a CLI that creates a piano-roll summary, groove statistics, and a JSON export.",
+    ),
     "developer_tooling": (
         "Audio Project Repro Kit",
         "A lightweight project manifest and command-line tool for making audio experiments "
@@ -80,7 +86,7 @@ IDEA_TEMPLATES: dict[str, tuple[str, str, str]] = {
 
 FALLBACK_TAGS = [
     "audio_ai", "speech", "dsp", "plugins", "synthesis", "spatial_audio", "mir",
-    "developer_tooling", "general_audio",
+    "midi", "developer_tooling", "general_audio",
 ]
 
 
@@ -92,7 +98,7 @@ class RepoIdeaEngine:
         trend_analysis: TrendAnalysis | None,
         sections: list[DigestSection],
         *,
-        limit: int = 5,
+        limit: int = 10,
     ) -> RepoIdeaSection:
         selected = [entry.candidate for section in sections for entry in section.entries]
         trend_tags = trend_analysis.dominant_tags if trend_analysis else []
@@ -120,7 +126,7 @@ class RepoIdeaEngine:
             )
 
         return RepoIdeaSection(
-            headline="5 Repo Ideas to Build This Week",
+            headline="10 Repo Ideas to Build This Week",
             intro=(
                 "These are deterministic build prompts derived from this week's repository "
                 "signals. They are starting points, not investment advice or certainty."

@@ -147,7 +147,7 @@ class ReportComposer:
         if forecast_section:
             toc.append(ToCEntry(title="🔮 Where Things Are Headed", anchor="forecasts"))
         if repo_ideas:
-            toc.append(ToCEntry(title="💡 5 Repo Ideas to Build", anchor="repo-ideas"))
+            toc.append(ToCEntry(title="💡 10 Repo Ideas to Build", anchor="repo-ideas"))
         return toc
 
 
@@ -299,7 +299,9 @@ class ReportRenderer:
                 )
 
         if report.repo_ideas:
-            lines.extend(["", "## 💡 5 Repo Ideas to Build This Week", "", report.repo_ideas.intro])
+            lines.extend(
+                ["", "## 💡 10 Repo Ideas to Build This Week", "", report.repo_ideas.intro]
+            )
             for idea in report.repo_ideas.ideas:
                 lines.extend(
                     [

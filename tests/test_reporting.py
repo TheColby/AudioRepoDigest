@@ -18,5 +18,5 @@ def test_renderer_outputs_html_text_and_markdown(rendered_report_bundle) -> None
     assert report.sections[0].entries[0].candidate.html_url in bundle.text
     assert "Stats:" not in bundle.html
     assert "Where Things Are Headed" in bundle.markdown
-    assert "5 Repo Ideas to Build This Week" in bundle.html
-    assert "5 REPO IDEAS TO BUILD THIS WEEK" in bundle.text
+    assert "10 Repo Ideas to Build This Week" in bundle.html
+    assert "10 REPO IDEAS TO BUILD THIS WEEK" in bundle.text
