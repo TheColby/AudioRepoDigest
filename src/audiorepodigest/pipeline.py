@@ -9,6 +9,7 @@ from audiorepodigest.forecasting import ForecastEngine
 from audiorepodigest.github_client import GitHubClient
 from audiorepodigest.models import CategoryKey, DateRange, PipelineResult, RepositoryCandidate
 from audiorepodigest.ranking import RankingEngine
+from audiorepodigest.repo_ideas import RepoIdeaEngine
 from audiorepodigest.reporting import ReportComposer, ReportRenderer, build_section
 from audiorepodigest.trends import TrendAnalyzer
 from audiorepodigest.utils.dates import resolve_period
@@ -29,6 +30,7 @@ class AudioRepoDigestPipeline:
         self.ranking = RankingEngine()
         self.trend_analyzer = TrendAnalyzer()
         self.forecaster = ForecastEngine()
+        self.repo_idea_engine = RepoIdeaEngine()
         self.report_composer = ReportComposer()
         self.report_renderer = ReportRenderer()
 
@@ -128,6 +130,11 @@ class AudioRepoDigestPipeline:
             if self.settings.include_forecasts and trend_analysis is not None
             else None
         )
+        repo_ideas = (
+            self.repo_idea_engine.generate(trend_analysis, sections)
+            if self.settings.include_repo_ideas
+            else None
+        )
 
         report = self.report_composer.compose(
             settings=self.settings,
@@ -137,6 +144,7 @@ class AudioRepoDigestPipeline:
             sections=sections,
             trend_analysis=trend_analysis,
             forecast_section=forecast_section,
+            repo_ideas=repo_ideas,
         )
         render_bundle = self.report_renderer.render(report, self.settings)
         return PipelineResult(report=report, render_bundle=render_bundle, discovery=discovery)

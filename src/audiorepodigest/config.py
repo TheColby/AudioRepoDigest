@@ -70,6 +70,7 @@ class DigestSettings(BaseSettings):
         validation_alias="INCLUDE_TREND_ANALYSIS",
     )
     include_forecasts: bool = Field(default=True, validation_alias="INCLUDE_FORECASTS")
+    include_repo_ideas: bool = Field(default=True, validation_alias="INCLUDE_REPO_IDEAS")
     suppress_honorable_mention_duplicates: bool = Field(
         default=True,
         validation_alias="SUPPRESS_HONORABLE_MENTION_DUPLICATES",

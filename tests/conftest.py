@@ -9,6 +9,7 @@ from audiorepodigest.config import DigestSettings
 from audiorepodigest.forecasting import ForecastEngine
 from audiorepodigest.models import CategoryKey, DateRange, DiscoveryResult, RepositoryCandidate
 from audiorepodigest.ranking import RankingEngine
+from audiorepodigest.repo_ideas import RepoIdeaEngine
 from audiorepodigest.reporting import ReportComposer, ReportRenderer, build_section
 from audiorepodigest.trends import TrendAnalyzer
 
@@ -141,6 +142,7 @@ def rendered_report_bundle(settings: DigestSettings, period: DateRange):
     ]
     trend_analysis = TrendAnalyzer().analyze(sections, [main_repo, ai_repo, new_repo])
     forecast = ForecastEngine().generate(trend_analysis, sections)
+    repo_ideas = RepoIdeaEngine().generate(trend_analysis, sections)
     discovery = DiscoveryResult(
         candidates=[main_repo, ai_repo, new_repo],
         query_count=5,
@@ -155,6 +157,7 @@ def rendered_report_bundle(settings: DigestSettings, period: DateRange):
         sections=sections,
         trend_analysis=trend_analysis,
         forecast_section=forecast,
+        repo_ideas=repo_ideas,
     )
     bundle = ReportRenderer().render(report, settings)
     return report, bundle

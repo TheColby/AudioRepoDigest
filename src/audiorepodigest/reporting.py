@@ -17,6 +17,7 @@ from audiorepodigest.models import (
     DiscoveryResult,
     ForecastSection,
     RenderBundle,
+    RepoIdeaSection,
     ToCEntry,
     TrendAnalysis,
 )
@@ -44,6 +45,7 @@ class ReportComposer:
         sections: list[DigestSection],
         trend_analysis: TrendAnalysis | None,
         forecast_section: ForecastSection | None,
+        repo_ideas: RepoIdeaSection | None,
     ) -> DigestReport:
         generated_at = datetime.now().astimezone()
         scanned_count = discovery.relevant_candidate_count
@@ -55,7 +57,7 @@ class ReportComposer:
             selected_repo_count=selected_repo_count,
             frequency=settings.report_frequency.value,
         )
-        toc = self._build_toc(sections, trend_analysis, forecast_section)
+        toc = self._build_toc(sections, trend_analysis, forecast_section, repo_ideas)
         methodology = [
             (
                 "AudioRepoDigest scans GitHub using multiple targeted search families for "
@@ -89,6 +91,7 @@ class ReportComposer:
             sections=sections,
             trend_analysis=trend_analysis,
             forecast_section=forecast_section,
+            repo_ideas=repo_ideas,
             methodology=methodology,
             version=__version__,
             metadata={
@@ -134,6 +137,7 @@ class ReportComposer:
         sections: list[DigestSection],
         trend_analysis: TrendAnalysis | None,
         forecast_section: ForecastSection | None,
+        repo_ideas: RepoIdeaSection | None,
     ) -> list[ToCEntry]:
         toc: list[ToCEntry] = []
         for section in sections:
@@ -142,6 +146,8 @@ class ReportComposer:
             toc.append(ToCEntry(title="📈 Trend Analysis", anchor="trend-analysis"))
         if forecast_section:
             toc.append(ToCEntry(title="🔮 Where Things Are Headed", anchor="forecasts"))
+        if repo_ideas:
+            toc.append(ToCEntry(title="💡 5 Repo Ideas to Build", anchor="repo-ideas"))
         return toc
 
 
@@ -289,6 +295,21 @@ class ReportRenderer:
                         f"Signals: {item.signals}",
                         "",
                         f"Implications: {item.implications}",
+                    ]
+                )
+
+        if report.repo_ideas:
+            lines.extend(["", "## 💡 5 Repo Ideas to Build This Week", "", report.repo_ideas.intro])
+            for idea in report.repo_ideas.ideas:
+                lines.extend(
+                    [
+                        "",
+                        f"### {idea.title}",
+                        idea.premise,
+                        "",
+                        f"Why now: {idea.why_now}",
+                        "",
+                        f"First release: {idea.first_release}",
                     ]
                 )
 

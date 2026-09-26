@@ -128,6 +128,21 @@ class ForecastSection(BaseModel):
     items: list[ForecastItem] = Field(default_factory=list)
 
 
+class RepoIdea(BaseModel):
+    title: str
+    premise: str
+    why_now: str
+    first_release: str
+    source_tags: list[str] = Field(default_factory=list)
+    inspiration_repositories: list[str] = Field(default_factory=list)
+
+
+class RepoIdeaSection(BaseModel):
+    headline: str
+    intro: str
+    ideas: list[RepoIdea] = Field(default_factory=list)
+
+
 class ToCEntry(BaseModel):
     title: str
     anchor: str
@@ -146,6 +161,7 @@ class DigestReport(BaseModel):
     sections: list[DigestSection] = Field(default_factory=list)
     trend_analysis: TrendAnalysis | None = None
     forecast_section: ForecastSection | None = None
+    repo_ideas: RepoIdeaSection | None = None
     methodology: list[str] = Field(default_factory=list)
     version: str
     metadata: dict[str, Any] = Field(default_factory=dict)

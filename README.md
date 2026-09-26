@@ -11,6 +11,7 @@ AudioRepoDigest discovers and ranks relevant GitHub repositories, then emails th
   - Top Audio Repos
   - Top New Audio/Music Repos
   - Top Audio AI Repos
+- Five deterministic, ecosystem-informed repository ideas to build each week
 - Executive summary, table of contents, trend analysis, and directional forecasts
 - Clickable inline repo links in the email body
 - Exported run artifacts: HTML, Markdown, JSON
@@ -123,6 +124,12 @@ Use `REPORT_VERBOSITY`:
 - `compact`: minimal cards, hidden detail blocks
 - `standard`: concise cards + expandable details
 - `detailed`: includes full metadata and expanded scoring details
+
+## Weekly Repo Ideas
+
+Every digest includes `5 Repo Ideas to Build This Week`. The ideas are generated without an LLM: the system maps dominant weekly tags and gaps in the scanned ecosystem to practical project archetypes, with a recommended first release and the relevant weekly signal.
+
+Set `INCLUDE_REPO_IDEAS=false` to disable this section.
 
 ## Local Development (Optional)
 
